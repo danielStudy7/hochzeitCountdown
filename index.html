@@ -5,115 +5,314 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Countdown bis 02.07.2027</title>
   <style>
+    :root {
+      color-scheme: light dark;
+
+      --bg-light-1: rgba(255, 255, 255, 0.55);
+      --bg-light-2: rgba(255, 255, 255, 0.28);
+      --border-light: rgba(255, 255, 255, 0.55);
+      --text-light: rgba(22, 22, 26, 0.92);
+      --muted-light: rgba(22, 22, 26, 0.62);
+      --shadow-light: 0 10px 30px rgba(31, 38, 135, 0.16);
+
+      --bg-dark-1: rgba(24, 24, 28, 0.5);
+      --bg-dark-2: rgba(255, 255, 255, 0.08);
+      --border-dark: rgba(255, 255, 255, 0.16);
+      --text-dark: rgba(255, 255, 255, 0.94);
+      --muted-dark: rgba(255, 255, 255, 0.66);
+      --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.28);
+
+      --accent: linear-gradient(135deg, rgba(120, 180, 255, 0.55), rgba(180, 120, 255, 0.35));
+    }
+
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
+      padding: 0;
+      width: 100%;
       background: transparent;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    .countdown-widget {
-      background: #111827;
-      color: #ffffff;
-      border-radius: 20px;
-      padding: 24px;
+    body {
+      padding: 14px;
+    }
+
+    .widget {
+      position: relative;
       width: 100%;
-      max-width: 520px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-      text-align: center;
+      max-width: 720px;
+      margin: 0 auto;
+      border-radius: 28px;
+      overflow: hidden;
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .widget::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .widget-inner {
+      position: relative;
+      padding: 22px 22px 20px;
+      z-index: 1;
+    }
+
+    .topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .title-wrap {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      opacity: 0.72;
     }
 
     .title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      opacity: 0.9;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
     }
 
-    .date {
-      font-size: 0.95rem;
-      opacity: 0.7;
-      margin-bottom: 22px;
+    .date-pill {
+      flex-shrink: 0;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      white-space: nowrap;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
     .timer {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 12px;
     }
 
     .unit {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 18px 10px;
+      position: relative;
+      border-radius: 22px;
+      padding: 18px 14px 16px;
+      text-align: center;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .unit::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02));
+      pointer-events: none;
     }
 
     .value {
-      font-size: 2rem;
+      position: relative;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
       font-weight: 700;
       line-height: 1;
-      margin-bottom: 8px;
+      letter-spacing: -0.04em;
+      z-index: 1;
     }
 
     .label {
-      font-size: 0.85rem;
-      opacity: 0.75;
+      position: relative;
+      margin-top: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      z-index: 1;
+    }
+
+    .footer {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.82rem;
+      opacity: 0.7;
     }
 
     .finished {
-      font-size: 1.4rem;
-      font-weight: 700;
-      padding: 20px 0;
+      padding: 30px 10px 24px;
+      text-align: center;
     }
 
-    @media (max-width: 520px) {
-      .timer {
-        grid-template-columns: repeat(2, 1fr);
+    .finished-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .finished-subtitle {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      opacity: 0.72;
+    }
+
+    @media (prefers-color-scheme: light) {
+      .widget {
+        background: linear-gradient(135deg, var(--bg-light-1), var(--bg-light-2));
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-light);
       }
 
-      .value {
-        font-size: 1.7rem;
+      .title,
+      .value,
+      .finished-title {
+        color: var(--text-light);
+      }
+
+      .eyebrow,
+      .label,
+      .footer,
+      .finished-subtitle {
+        color: var(--muted-light);
+      }
+
+      .date-pill,
+      .unit {
+        background: rgba(255, 255, 255, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.38);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.32);
+      }
+
+      html, body {
+        background:
+          radial-gradient(circle at top left, rgba(120, 180, 255, 0.12), transparent 35%),
+          radial-gradient(circle at bottom right, rgba(190, 140, 255, 0.10), transparent 35%),
+          transparent;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .widget {
+        background: linear-gradient(135deg, var(--bg-dark-1), var(--bg-dark-2));
+        border: 1px solid var(--border-dark);
+        box-shadow: var(--shadow-dark);
+      }
+
+      .title,
+      .value,
+      .finished-title {
+        color: var(--text-dark);
+      }
+
+      .eyebrow,
+      .label,
+      .footer,
+      .finished-subtitle {
+        color: var(--muted-dark);
+      }
+
+      .date-pill,
+      .unit {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+      }
+
+      html, body {
+        background:
+          radial-gradient(circle at top left, rgba(120, 180, 255, 0.08), transparent 35%),
+          radial-gradient(circle at bottom right, rgba(190, 140, 255, 0.08), transparent 35%),
+          transparent;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topline {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .date-pill {
+        white-space: normal;
+      }
+
+      .timer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding: 10px;
+      }
+
+      .widget-inner {
+        padding: 18px 18px 16px;
+      }
+
+      .unit {
+        padding: 16px 10px 14px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="countdown-widget">
-    <div class="title">Countdown bis zum 2. Juli 2027</div>
-    <div class="date">02.07.2027, 11:00 Uhr</div>
+  <div class="widget">
+    <div class="widget-inner">
+      <div class="topline">
+        <div class="title-wrap">
+          <div class="eyebrow">Countdown</div>
+          <div class="title">Bis zum 2. Juli 2027</div>
+        </div>
+        <div class="date-pill">02.07.2027 · 11:00 Uhr</div>
+      </div>
 
-    <div class="timer" id="timer">
-      <div class="unit">
-        <div class="value" id="days">0</div>
-        <div class="label">Tage</div>
+      <div class="timer" id="timer">
+        <div class="unit">
+          <div class="value" id="days">0</div>
+          <div class="label">Tage</div>
+        </div>
+        <div class="unit">
+          <div class="value" id="hours">00</div>
+          <div class="label">Stunden</div>
+        </div>
+        <div class="unit">
+          <div class="value" id="minutes">00</div>
+          <div class="label">Minuten</div>
+        </div>
+        <div class="unit">
+          <div class="value" id="seconds">00</div>
+          <div class="label">Sekunden</div>
+        </div>
       </div>
-      <div class="unit">
-        <div class="value" id="hours">0</div>
-        <div class="label">Stunden</div>
-      </div>
-      <div class="unit">
-        <div class="value" id="minutes">0</div>
-        <div class="label">Minuten</div>
-      </div>
-      <div class="unit">
-        <div class="value" id="seconds">0</div>
-        <div class="label">Sekunden</div>
-      </div>
+
+      <div class="footer">Automatisch angepasst an Hell- und Dunkelmodus</div>
     </div>
   </div>
 
   <script>
     const targetDate = new Date("2027-07-02T11:00:00");
-
     const daysEl = document.getElementById("days");
     const hoursEl = document.getElementById("hours");
     const minutesEl = document.getElementById("minutes");
@@ -125,14 +324,19 @@
       const difference = targetDate - now;
 
       if (difference <= 0) {
-        timerEl.innerHTML = '<div class="finished">🎉 Das Datum ist erreicht!</div>';
+        timerEl.innerHTML = `
+          <div class="finished">
+            <div class="finished-title">🎉 Der Tag ist da</div>
+            <div class="finished-subtitle">Der 2. Juli 2027 wurde erreicht.</div>
+          </div>
+        `;
         return;
       }
 
       const totalSeconds = Math.floor(difference / 1000);
-      const days = Math.floor(totalSeconds / (60 * 60 * 24));
-      const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
-      const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
       const seconds = totalSeconds % 60;
 
       daysEl.textContent = days;
